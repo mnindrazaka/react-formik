@@ -3,11 +3,19 @@ import logo from './logo.svg'
 import './App.css'
 
 import { Formik, Form, FormikErrors } from 'formik'
+import * as Yup from 'yup'
 
 interface IFormValues {
   email: string
   password: string
 }
+
+const LoginSchema = Yup.object().shape({
+  email: Yup.string()
+    .email()
+    .required(),
+  password: Yup.string().min(8)
+})
 
 class App extends Component {
   render() {
@@ -18,27 +26,7 @@ class App extends Component {
 
           <Formik
             initialValues={{ email: '', password: '' }}
-            validate={values => {
-              const errors: FormikErrors<IFormValues> = {}
-
-              if (!values.email) errors.email = 'Required'
-              if (
-                !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
-              ) {
-                errors.email = 'You must supply a valid email address'
-              }
-
-              if (values.password.length < 8) {
-                errors.password = 'Passwords must be at least 8 characters'
-              }
-
-              if (values.email === values.password) {
-                errors.password =
-                  "Your password shouldn't be the same as your email"
-              }
-
-              return errors
-            }}
+            validationSchema={LoginSchema}
             onSubmit={(values, { setSubmitting }) => {
               setTimeout(() => setSubmitting(false), 3 * 1000)
             }}
